@@ -1,0 +1,17 @@
+name = "worker-rust"
+main = "build/worker/shim.mjs"
+compatibility_date = "2023-06-28"
+
+workers_dev = false
+
+[build]
+command = "cargo install -q worker-build && worker-build --release"
+
+# [[r2_buckets]]
+# binding = 'R2'                 # <~ valid JavaScript variable name
+# bucket_name = 'cf-exp'
+# preview_bucket_name = 'cf-exp'
+
+
+[triggers]
+crons = ["0 11 * * *"]

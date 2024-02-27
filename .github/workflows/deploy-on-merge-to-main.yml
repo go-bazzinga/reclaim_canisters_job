@@ -1,0 +1,48 @@
+name: Deploy to Fly on push to main
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build_check:
+    uses: ./.github/workflows/build-check.yml
+
+  # deploy:
+  #   name: Deploy
+  #   needs: build_check
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: superfly/flyctl-actions/setup-flyctl@master
+  #     - name: Set cloudflare token
+  #       run: |
+  #         flyctl secrets set "CF_R2_ACCESS_KEY_TEMP=$CF_R2_ACCESS_KEY_TEMP" --app "icp-off-chain-agent" --stage
+  #         flyctl secrets set "CF_R2_SECRET_ACCESS_KEY_TEMP=$CF_R2_SECRET_ACCESS_KEY_TEMP" --app "icp-off-chain-agent" --stage
+  #         flyctl secrets set "CF_WORKER_ACCESS_OFF_CHAIN_AGENT_KEY=$CF_WORKER_ACCESS_OFF_CHAIN_AGENT_KEY" --app "icp-off-chain-agent" --stage
+  #         flyctl secrets set "RECLAIM_CANISTER_PEM=$RECLAIM_CANISTER_PEM" --app "icp-off-chain-agent" --stage
+  #         flyctl secrets set "HOTORNOT_CF_ACCOUNT_ID=$HOTORNOT_CF_ACCOUNT_ID" --app "icp-off-chain-agent" --stage
+  #       env:
+  #         CF_WORKER_ACCESS_OFF_CHAIN_AGENT_KEY: ${{ secrets.CF_WORKER_ACCESS_OFF_CHAIN_AGENT_KEY }}
+  #         CLOUDFLARE_ACCOUNT_ID: ${{ secrets.HOTORNOT_CF_ACCOUNT_ID }}
+  #         CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  #     - name: Deploy a docker container to fly.io
+  #       run: flyctl deploy --remote-only
+  #       env:
+  #         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+  deploy:
+    name: Deploy
+    needs: build_check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          secrets: |
+            CF_WORKER_ACCESS_OFF_CHAIN_AGENT_KEY
+        env:
+          CF_WORKER_ACCESS_OFF_CHAIN_AGENT_KEY: ${{ secrets.CF_WORKER_ACCESS_OFF_CHAIN_AGENT_KEY }}
