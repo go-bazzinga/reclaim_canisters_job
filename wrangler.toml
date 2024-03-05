@@ -13,5 +13,5 @@ command = "cargo install -q worker-build && worker-build --release"
 # preview_bucket_name = 'cf-exp'
 
 
-# [triggers]
-# crons = ["0 11 * * *"]
+[triggers]
+crons = ["0 4 * * *"]
