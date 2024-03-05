@@ -14,4 +14,4 @@ command = "cargo install -q worker-build && worker-build --release"
 
 
 [triggers]
-crons = ["0 4 * * *"]
+crons = ["0 1 * * *"]
